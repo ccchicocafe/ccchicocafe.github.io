@@ -55,11 +55,29 @@
                             html = "<div class='uk-column-1-2'>";
                         }
                         for (i = 0; i < groups.length; i++) {
-                            html += '<h3>';
-                            html += groups[i];
-                            html += '</h3>';
-                            html += '<table class="uk-table uk-table-divider">';
-                            html += '<tbody>';
+                            if (data.menu1JSON.elements[0].variation === data.menu1JSON.elements[1].variation) {
+                                html += '<table class="uk-table uk-table-divider">';
+                                html += '<thead>';
+                                html += '<th>';
+                                html += '<h3>';
+                                html += groups[i];
+                                html += '</h3>';
+                                html += '</th>';
+                                var sizes = data.menu1JSON.elements[0].variation.split(', ');
+                                for (ii = 0; ii < sizes.length; ii++) {
+                                    html += '<th>';
+                                    html += sizes[ii];
+                                    html += '</th>';
+                                }
+                                html += '</thead>';
+                                html += '<tbody>';
+                            } else {
+                                html += '<table class="uk-table uk-table-divider">';
+                                html += '<caption>';
+                                html += groups[i];
+                                html += '</caption>';
+                                html += '<tbody>';
+                            }
                             for (ii = 0; ii < data.menu1JSON.elements.length; ii++) {
                                 if (data.menu1JSON.elements[ii].group === groups[i]) {
                                     var sizes = data.menu1JSON.elements[ii].variation.split(', ');
@@ -73,8 +91,12 @@
                                     //html += '<table class="uk-table-small"><tbody><tr>';
                                     for (iii = 0; iii < sizes.length; iii++) {
                                         html += '<td>';
-                                        html += sizes[iii];
-                                        html += ' ';
+                                        if (data.menu1JSON.elements[0].variation !== data.menu1JSON.elements[ii].variation) {
+                                            html += '<b>';
+                                            html += sizes[iii];
+                                            html += '</b>';
+                                            html += '<br>';
+                                        }
                                         html += prices[iii];
                                         html += '</td>';
                                     }
@@ -94,9 +116,12 @@
                         html += '</div>';
                         //
                         document.body.innerHTML = html;
-                        var font = 2.6;
+                        var font = 5;
+                        if (wide) {
+                            font = 2.6
+                        }
                         while (check(document.body)) {
-                            font = font - 0.1;
+                            font = font - 0.02;
                             console.log(font)
                             document.documentElement.style.setProperty('font-size', font + 'vw');
                         }
