@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <title>Menu 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/uikit.min.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <script src="js/uikit.min.js"></script>
+    <script src="js/uikit-icons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.6.2/tabletop.min.js" integrity="sha256-8za/zwqM08X55RXykMVIlHmYJXzV+4bwNzUk0MZXJoQ=" crossorigin="anonymous"></script>
+    <script>
+        var html;
+
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+
+        function check(el) {
+            var curOverf = el.style.overflow;
+
+            if (!curOverf || curOverf === "visible")
+                el.style.overflow = "hidden";
+
+            var isOverflowing = el.clientWidth < el.scrollWidth ||
+                el.clientHeight < el.scrollHeight;
+
+            el.style.overflow = curOverf;
+
+            return isOverflowing;
+        }
+
+        function menu() {
+            if (typeof(Storage) !== "undefined") {
+                console.log("storage is working");
+                if (typeof localStorage.menu1 === 'undefined' || localStorage.menu1 === 'undefined' || localStorage.menu1 === null) {
+                    console.log("localStorage.menu1 is empty");
+                    Tabletop.init({
+                        key: '1UdIiAaKG_FmHzBnIwV3A4C85t3_Pnfsaunf4slLxLtg',
+                        callback: update,
+                        simpleSheet: false
+                    });
+                } else {
+                    console.log("localStorage.menu1 isn't empty");
+                    if (document.body.innerHTML != localStorage.menu1) {
+                        //console.log(typeof localStorage.menu1);
+                        //console.log(document.body.innerHTML);
+                        //console.log(localStorage.menu1);
+                        console.log("localStorage.menu1 isn't onscreen");
+                        document.body.innerHTML = localStorage.menu1;
+                        Tabletop.init({
+                            key: '1UdIiAaKG_FmHzBnIwV3A4C85t3_Pnfsaunf4slLxLtg',
+                            callback: update,
+                            simpleSheet: false
+                        });
+                    } else {
+                        console.log("localStorage.menu1 is already onscreen");
+                        Tabletop.init({
+                            key: '1UdIiAaKG_FmHzBnIwV3A4C85t3_Pnfsaunf4slLxLtg',
+                            callback: update,
+                            simpleSheet: false
+                        });
+                    }
+                }
+            } else {
+                console.log("storage isn't working");
+                Tabletop.init({
+                    key: '1UdIiAaKG_FmHzBnIwV3A4C85t3_Pnfsaunf4slLxLtg',
+                    callback: update,
+                    simpleSheet: false
+                });
+            }
+            setTimeout(menu, 10000);
+        }
+
+        function update(data, tabletop) {
+            console.log("Updating...");
+            //console.log(data);
+            console.log(data.menu1JSON);
+            //console.log(data.menu1JSON.elements[0].variation)
+            var groups = [];
+            for (i = 0; i < data.menu1JSON.elements.length; i++) {
+                groups.push(data.menu1JSON.elements[i].group)
+            }
+            groups = groups.filter(onlyUnique);
+            //console.log(groups)
+            html = '<div id="container" class="uk-overlay-panel uk-overlay-fade">';
+            for (i = 0; i < groups.length; i++) {
+                html += '<table class="uk-table uk-table-divider">';
+                if (data.menu1JSON.elements[0].variation === data.menu1JSON.elements[1].variation) {
+                    html += '<thead>';
+                    html += '<tr>';
+                    html += '<th>';
+                    html += '<h4>';
+                    html += groups[i];
+                    html += '</h4>';
+                    html += '</th>';
+                    var sizes = data.menu1JSON.elements[0].variation.split(', ');
+                    for (ii = 0; ii < sizes.length; ii++) {
+                        html += '<th>';
+                        html += sizes[ii];
+                        html += '</th>';
+                    }
+                    html += '</tr>';
+                    html += '</thead>';
+                    html += '<tbody>';
+                } else {
+                    html += '<caption>';
+                    html += groups[i];
+                    html += '</caption>';
+                    html += '<tbody>';
+                }
+                for (ii = 0; ii < data.menu1JSON.elements.length; ii++) {
+                    if (data.menu1JSON.elements[ii].group === groups[i]) {
+                        var sizes = data.menu1JSON.elements[ii].variation.split(', ');
+                        var prices = data.menu1JSON.elements[ii].price.split(', ');
+                        html += '<tr>';
+                        //html += '<td class="uk-table-expand">';
+                        html += '<td>';
+                        html += data.menu1JSON.elements[ii].itemName;
+                        html += '</td>';
+                        //html += '<td class="uk-table-shrink">';
+                        //html += '<td>';
+                        //html += '<table class="uk-table-small"><tbody><tr>';
+                        for (iii = 0; iii < sizes.length; iii++) {
+                            html += '<td>';
+                            if (data.menu1JSON.elements[0].variation !== data.menu1JSON.elements[ii].variation) {
+                                html += '<b>';
+                                html += sizes[iii];
+                                html += '</b>';
+                                html += '<br>';
+                            }
+                            html += prices[iii];
+                            html += '</td>';
+                        }
+                        //html += '</tr></tbody></table>';
+                        //html += '</td>';
+                        html += '</tr>';
+                        //if (Math.round((data.menu1JSON.elements.length + groups.length) / 2) == (i + ii)) {
+                        //    html += '</div>';
+                        //    html += '<div class="uk-column-2-2">';
+                        //}
+
+                    }
+                }
+                html += '</tbody>';
+                html += '</table>';
+            }
+            html += '</div>';
+            //
+            if (typeof localStorage.menu1Font === 'undefined' || localStorage.menu1Font === 'undefined' || localStorage.menu1Font === null) {
+                document.documentElement.style.setProperty('font-size', localStorage.menu1Font + 'vw');
+            }
+            if (localStorage.menu1Raw !== html) {
+                document.body.innerHTML = html;
+                localStorage.menu1Raw = html;
+                var div = document.getElementById("container");
+                resize(div);
+            } else {
+                console.log("No Change");
+            }
+            var div = document.getElementById("container");
+            if (check(div)) {
+                resize(div);
+            }
+            if (localStorage.menu1 !== document.body.innerHTML) {
+                localStorage.menu1 = document.body.innerHTML;
+            }
+        }
+
+        function resize(div) {
+            var font = 7;
+            var wide = 0;
+            if (document.documentElement.clientWidth < document.documentElement.clientHeight) {
+                document.documentElement.style.setProperty('padding-top', '177.778%');
+                div.classList.remove("uk-column-1-2");
+            } else {
+                wide = 1;
+                document.documentElement.style.setProperty('padding-top', '56.25%');
+                div.classList.add("uk-column-1-2");
+            }
+            if (check(div)) {
+                console.log("Resizing...")
+                if (wide) {
+                    font = 3.5
+                }
+                while (check(div)) {
+                    font = font - 0.02;
+                    console.log(font)
+                    document.documentElement.style.setProperty('font-size', font + 'vw');
+                }
+                //font = font - 0.1;
+                //console.log(font)
+                //document.documentElement.style.setProperty('font-size', font + 'vw');
+            }
+            localStorage.menu1Font = font;
+        }
+        window.addEventListener('DOMContentLoaded', menu);
+    </script>
+</head>
+
+<body class="uk-light" onclick="location.reload(true);">
+</body>
+
+</html>
